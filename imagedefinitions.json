@@ -1,0 +1,6 @@
+[
+  {
+    "name": "batch-service",
+    "imageUri": "944574314488.dkr.ecr.us-east-1.amazonaws.com/batch-service:latest"
+  }
+]
