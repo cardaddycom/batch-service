@@ -9,9 +9,9 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.cardaddy</groupId>
-    <artifactId>cardaddy-batch</artifactId>
+    <artifactId>batch-service</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>batch-service</name>
+    <name>Batch Service</name>
     <description>Cardaddy Vehicle Batch</description>
     <properties>
         <java.version>11</java.version>

@@ -1,6 +1,6 @@
 FROM public.ecr.aws/amazoncorretto/amazoncorretto:17
 # Add Maintainer Info
-LABEL maintainer="gchristman@cardaddy.com"
+LABEL maintainer="george.christman@healthresearch.org"
 
 # Add a volume pointing to /tmp
 VOLUME /tmp
