@@ -3,12 +3,6 @@ spring:
     url: jdbc:mysql://${MYSQL_HOST:localhost}:${MYSQL_PORT:3306}/${MYSQL_DB:cardaddy}?useSSL=false
     username: ${MYSQL_USERNAME:root}
     password: ${MYSQL_PASSWORD:password}
-  jpa:
-    properties:
-      hibernate:
-        search:
-          backend:
-            uris: http://localhost:9200
     show-sql: false
   batch:
     jdbc:

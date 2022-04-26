@@ -1,0 +1,15 @@
+spring:
+  jpa:
+    properties:
+      hibernate:
+        search:
+          backend:
+            uris: ${AWS_OPENSEARCH_URIS}
+            aws:
+              signing:
+                enabled: true
+              region: ${AWS_REGION}
+              credentials:
+                type: static
+                access_key_id: ${AWS_ACCESS_KEY_ID}
+                secret_access_key: ${AWS_SECRET_ACCESS_KEY}
