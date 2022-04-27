@@ -27,4 +27,13 @@ public class ImportConfiguration extends BaseEntity {
     @JoinColumn(name = "import_field_id", nullable = false)
     private ImportField importField;
 
+    private Integer csvColumnPosition;
+
+    @Override
+    public String toString() {
+        return "ImportConfiguration{" +
+                "fileFieldName='" + fileFieldName + '\'' +
+                ", csvColumnPosition=" + csvColumnPosition +
+                '}';
+    }
 }

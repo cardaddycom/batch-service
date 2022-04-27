@@ -1,38 +1,34 @@
 package com.cardaddy.batch.job;
 
 import com.cardaddy.batch.model.FlatVehicleListing;
-import com.cardaddy.batch.repository.ImportTaskRepository;
-import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.annotation.BeforeStep;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.item.ItemReader;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.batch.item.NonTransientResourceException;
+import org.springframework.batch.item.ParseException;
+import org.springframework.batch.item.UnexpectedInputException;
 
+@Slf4j
 public class VehicleItemReader implements ItemReader<FlatVehicleListing> {
-
-    @Autowired
-    private ImportTaskRepository respository;
-
-//    private Iterator<CreditCard> usersIterator;
-
-    @BeforeStep
-    public void before(StepExecution stepExecution) {
-//        usersIterator = respository.findAll().iterator();
-    }
-
     @Override
-    public FlatVehicleListing read() {
-//        if (usersIterator != null && usersIterator.hasNext()) {
-//            return usersIterator.next();
-//        } else {
-            return null;
-//        }
-    }
+    public FlatVehicleListing read() throws Exception, UnexpectedInputException, ParseException, NonTransientResourceException {
 
-    //    @Bean
-//    public FlatFileItemReader reader() {
+        return null;
+    }
+//
+//    @Autowired
+//    private ImportTaskRepository repository;
+//
+////    private Iterator<CreditCard> usersIterator;
+//
+//    @BeforeStep
+//    public void before(StepExecution stepExecution) {
+////        usersIterator = respository.findAll().iterator();
+//    }
+//
+//    public FlatFileItemReader<FlatVehicleListing> reader() {
 //        log.info("Flat File Item Reader");
-////        ImportTask importTask = importTaskRepository.getById(jobId);
-////        log.debug("importTask {}", importTask.getFilename());
+//        ImportTask importTask = repository.getById(1L);
+//        log.debug("importTask {}", importTask.getFilename());
 //
 //        FlatFileItemReader reader = new FlatFileItemReader<>();
 //        reader.setResource(new ClassPathResource("homenetinc.csv"));

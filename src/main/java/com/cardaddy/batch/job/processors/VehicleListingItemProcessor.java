@@ -9,7 +9,10 @@ public class VehicleListingItemProcessor implements ItemProcessor<FlatVehicleLis
 
     @Override
     public FlatVehicleListing process(FlatVehicleListing flatVehicleListing) throws Exception {
-        log.info("Vehicle Listing Item Processor");
+        log.info("Vehicle Listing Item Processor {}", flatVehicleListing.getVin());
+
+        flatVehicleListing.setVin(flatVehicleListing.getVin().toUpperCase());
+
         return flatVehicleListing;
     }
 

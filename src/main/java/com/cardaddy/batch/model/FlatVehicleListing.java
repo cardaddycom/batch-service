@@ -18,7 +18,8 @@ public class FlatVehicleListing {
     private String description;
     private String vin;
     private String stockNumber;
-    private String dealerId;
+    private Long dealerId;
+    private Long partnerId;
     private String body;
     private String doors;
     private String exteriorColor;
@@ -52,4 +53,24 @@ public class FlatVehicleListing {
     private String category;
     private String title;
 
+    //Filled during the processor step
+    private boolean dealix;
+    private boolean detroitTrader;
+    private String sellerType;
+    private String inventoryType;
+    private String vehicleTitle;
+
+
+    @Override
+    public String toString() {
+        return "FlatVehicleListing{" +
+                "year='" + year + '\'' +
+                ", make='" + make + '\'' +
+                ", model='" + model + '\'' +
+                ", trim='" + trim + '\'' +
+                ", vin='" + vin + '\'' +
+                ", stockNumber='" + stockNumber + '\'' +
+                ", dealerId='" + dealerId + '\'' +
+                '}';
+    }
 }
