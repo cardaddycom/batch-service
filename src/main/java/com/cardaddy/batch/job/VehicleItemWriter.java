@@ -8,6 +8,7 @@ import com.cardaddy.batch.domain.lookup.*;
 import com.cardaddy.batch.domain.task.imports.ImportTask;
 import com.cardaddy.batch.model.FlatVehicleListing;
 import com.cardaddy.batch.repository.*;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -15,7 +16,10 @@ import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Slf4j
 public class VehicleItemWriter implements ItemWriter<FlatVehicleListing> {
+
+    public static final Long DEALER_SELLER_TYPE_ID = 1L;
 
     @Autowired
     private VehicleListingRepository vehicleListingRepository;
@@ -64,14 +68,14 @@ public class VehicleItemWriter implements ItemWriter<FlatVehicleListing> {
         var modelMap = createOrUpdateModel(listings);
         var trimMap = createOrUpdateTrim(listings);
         var inventoryTypeMap = getInventoryTypeMap();
-        var sellerTypeMap = getSellerTypeMap();
+        var sellerType = getSellerType();
         var bodyTypeMap = getBodyTypeMap();
         var transmissionMap = getTransmissionMap();
         var conditionMap = getConditionMap();
         var colorMap = getColorMap();
         var categoryMap = getCategoryMap();
         var dealerMap = getDealerMap(listings);
-        var partnerMap = getPartnerMap(listings);
+//        var partnerMap = getPartnerMap(listings);
         var locationMap = getLocationMap(listings);
 
         //TODO SET IMPORTASK ID FROM JOB
@@ -88,7 +92,6 @@ public class VehicleItemWriter implements ItemWriter<FlatVehicleListing> {
                 var vinKey = flatVehicleListing.getVin().toLowerCase();
                 var vehicleListing = existingVehicles.contains(vinKey) ? existingVehiclesMap.get(vinKey) : new VehicleListing();
                 var inventoryType = inventoryTypeMap.get(flatVehicleListing.getInventoryType());
-                var sellerType = sellerTypeMap.get(flatVehicleListing.getSellerType());
                 var bodyType = bodyTypeMap.get(flatVehicleListing.getBody());
                 var transmission = transmissionMap.get(flatVehicleListing.getTransmission());
                 var condition = conditionMap.get(flatVehicleListing.getCondition());
@@ -96,15 +99,19 @@ public class VehicleItemWriter implements ItemWriter<FlatVehicleListing> {
                 var exteriorColor = colorMap.get(flatVehicleListing.getExteriorColor());
                 var category = categoryMap.get(flatVehicleListing.getCategory());
                 var dealer = dealerMap.get(flatVehicleListing.getDealerId());
-                var partner = partnerMap.get(flatVehicleListing.getPartnerId());
                 var location = locationMap.get(flatVehicleListing.getZipcode());
 
-                var updatedListing = buildVehicleListing(flatVehicleListing, vehicleListing, year, make, model, trim, inventoryType, sellerType,
-                        bodyType, transmission, condition, interiorColor, exteriorColor, category, dealer, partner, importTask, location);
-                vehicleListings.add(updatedListing);
+                if(dealer != null) {
+                    var updatedListing = buildVehicleListing(flatVehicleListing, vehicleListing, year, make, model, trim, inventoryType, sellerType,
+                            bodyType, transmission, condition, interiorColor, exteriorColor, category, dealer, null, importTask, location);
+                    vehicleListings.add(updatedListing);
+                } else {
+                    log.debug("Dealer {} missing", flatVehicleListing.getDealerId());
+                }
             }
         }
 
+        log.debug("Saving Vehicles {}", vehicleListings.size());
         vehicleListingRepository.saveAll(vehicleListings);
     }
 
@@ -132,7 +139,7 @@ public class VehicleItemWriter implements ItemWriter<FlatVehicleListing> {
             vehicleListing.setCreateDate(new Date());
         }
 
-        //TODO ADD UPDATE DATE
+        vehicleListing.setSchedulerDate(flatVehicleListing.getSchedulerDate());
         vehicleListing.setExteriorColorCustom(flatVehicleListing.getExteriorColor());
         vehicleListing.setInteriorColorCustom(flatVehicleListing.getExteriorColor());
         vehicleListing.setDealerLiveId(flatVehicleListing.getDealerLiveId());
@@ -170,21 +177,29 @@ public class VehicleItemWriter implements ItemWriter<FlatVehicleListing> {
         vehicleListing.setSellerType(sellerType);
         vehicleListing.setCityMPG(flatVehicleListing.getCityMPG());
         vehicleListing.setHighwayMPG(flatVehicleListing.getHighwayMPG());
-        vehicleListing.setDistance(Integer.valueOf(flatVehicleListing.getDistance()));
         vehicleListing.setStockNumber(flatVehicleListing.getStockNumber());
         vehicleListing.setPpcUrl(flatVehicleListing.getPpcUrl());
-        vehicleListing.setPhonePayoutPrice(new BigDecimal(flatVehicleListing.getPhonePayoutPrice()));
         vehicleListing.setPhoneExtension(flatVehicleListing.getPhoneExtension());
-        vehicleListing.setWebPayoutPrice(new BigDecimal(flatVehicleListing.getWebPayoutPrice()));
-        vehicleListing.setNumberOfImages(Integer.valueOf(flatVehicleListing.getNumberOfImages()));
         vehicleListing.setWebsiteListingUrl(flatVehicleListing.getWebsiteListingUrl());
         vehicleListing.setImportPhotoUrls(flatVehicleListing.getPhotoURLs());
 
+        if(flatVehicleListing.getNumberOfImages() != null) {
+            vehicleListing.setNumberOfImages(Integer.valueOf(flatVehicleListing.getNumberOfImages()));
+        }
+        if(flatVehicleListing.getDistance() != null) {
+            vehicleListing.setDistance(Integer.valueOf(flatVehicleListing.getDistance()));
+        }
+        if(flatVehicleListing.getPhonePayoutPrice() != null) {
+            vehicleListing.setPhonePayoutPrice(new BigDecimal(flatVehicleListing.getPhonePayoutPrice()));
+        }
+        if(flatVehicleListing.getWebPayoutPrice() != null) {
+            vehicleListing.setWebPayoutPrice(new BigDecimal(flatVehicleListing.getWebPayoutPrice()));
+        }
         return  vehicleListing;
     }
 
     private Map<String, VehicleMake> createOrUpdateMake(List<FlatVehicleListing> list) {
-        List<String> keys = list.stream().map(vehicleListing -> vehicleListing.getMake()).collect(Collectors.toList());
+        Set<String> keys = list.stream().map(vehicleListing -> vehicleListing.getMake()).collect(Collectors.toSet());
 
         List<VehicleMake> existingVehicles = vehicleMakeRepository.getVehicleMakeByNameIn(keys);
 
@@ -197,7 +212,7 @@ public class VehicleItemWriter implements ItemWriter<FlatVehicleListing> {
             String key = listing.getMake().toLowerCase();
             if (!existingItemsMap.containsKey(key)) {
                 VehicleMake make = new VehicleMake();
-                make.setName(listing.getMake());
+                make.setName(listing.getMake().trim());
                 make.setVote(1);
                 newItemsMap.put(key, make);
             }
@@ -211,7 +226,7 @@ public class VehicleItemWriter implements ItemWriter<FlatVehicleListing> {
     }
 
     private Map<String, VehicleModel> createOrUpdateModel(List<FlatVehicleListing> list) {
-        List<String> keys = list.stream().map(vehicleListing -> vehicleListing.getModel()).collect(Collectors.toList());
+        Set<String> keys = list.stream().map(vehicleListing -> vehicleListing.getModel()).collect(Collectors.toSet());
 
         List<VehicleModel> existingVehicles = vehicleModelRepository.getVehicleModelByNameIn(keys);
 
@@ -224,7 +239,7 @@ public class VehicleItemWriter implements ItemWriter<FlatVehicleListing> {
             String key = listing.getModel().toLowerCase();
             if (!existingItemsMap.containsKey(key)) {
                 VehicleModel model = new VehicleModel();
-                model.setName(listing.getModel());
+                model.setName(listing.getModel().trim());
                 model.setVote(1);
                 newItemsMap.put(key, model);
             }
@@ -238,21 +253,22 @@ public class VehicleItemWriter implements ItemWriter<FlatVehicleListing> {
     }
 
     private Map<String, VehicleTrim> createOrUpdateTrim(List<FlatVehicleListing> list) {
-        List<String> keys = list.stream().map(vehicleListing -> vehicleListing.getTrim()).collect(Collectors.toList());
+        Set<String> keys = list.stream().map(vehicleListing -> vehicleListing.getTrim()).collect(Collectors.toSet());
 
         List<VehicleTrim> existingVehicles = vehicleTrimRepository.getVehicleTrimByNameIn(keys);
 
         Map<String, VehicleTrim> existingItemsMap =
-                existingVehicles.stream().collect(Collectors.toMap(key -> key.getName().toLowerCase(), VehicleTrim -> VehicleTrim, (a, b) -> b));
+                existingVehicles.stream().collect(Collectors.toMap(key -> key.getName().trim().toLowerCase(), VehicleTrim -> VehicleTrim, (a, b) -> b));
 
         Map<String, VehicleTrim> newItemsMap = new HashMap<>();
 
+        existingItemsMap.entrySet().forEach(System.out::println);
         list.forEach(listing -> {
             if(listing.getTrim() != null) {
                 String key = listing.getTrim().toLowerCase();
                 if (!existingItemsMap.containsKey(key)) {
                     VehicleTrim trim = new VehicleTrim();
-                    trim.setName(listing.getTrim());
+                    trim.setName(listing.getTrim().trim());
                     trim.setVote(1);
                     newItemsMap.put(key, trim);
                 }
@@ -267,7 +283,7 @@ public class VehicleItemWriter implements ItemWriter<FlatVehicleListing> {
     }
 
     private Map<String, VehicleYear> createOrUpdateYear(List<FlatVehicleListing> list) {
-        List<String> keys = list.stream().map(vehicleListing -> vehicleListing.getYear()).collect(Collectors.toList());
+        Set<String> keys = list.stream().map(vehicleListing -> vehicleListing.getYear()).collect(Collectors.toSet());
 
         List<VehicleYear> existingVehicles = vehicleYearRepository.getVehicleYearByNameIn(keys);
 
@@ -281,7 +297,7 @@ public class VehicleItemWriter implements ItemWriter<FlatVehicleListing> {
                 String key = listing.getYear().toLowerCase();
                 if (!existingItemsMap.containsKey(key)) {
                     VehicleYear year = new VehicleYear();
-                    year.setName(listing.getYear());
+                    year.setName(listing.getYear().trim());
                     year.setVote(1);
                     newItemsMap.put(key, year);
                 }
@@ -302,18 +318,11 @@ public class VehicleItemWriter implements ItemWriter<FlatVehicleListing> {
                 .collect(Collectors.toMap(key -> key.getZip().toLowerCase(), Location -> Location, (a, b) -> b));
     }
 
-    private Map<Long, DealerProfile> getDealerMap(List<FlatVehicleListing> list) {
-        Set<Long> keys = list.stream().map(vehicleListing -> vehicleListing.getDealerId()).collect(Collectors.toSet());
+    private Map<String, DealerProfile> getDealerMap(List<FlatVehicleListing> list) {
+        Set<String> keys = list.stream().map(vehicleListing -> vehicleListing.getDealerId()).collect(Collectors.toSet());
 
-        return dealerRepository.getDealerProfileByIdIn(keys).stream()
-                .collect(Collectors.toMap(key -> key.getId(), Location -> Location, (a, b) -> b));
-    }
-
-    private Map<Long, PartnerProfile> getPartnerMap(List<FlatVehicleListing> list) {
-        Set<Long> keys = list.stream().map(vehicleListing -> vehicleListing.getPartnerId()).collect(Collectors.toSet());
-
-        return partnerRepository.getPartnerProfileByIdIn(keys).stream()
-                .collect(Collectors.toMap(key -> key.getId(), Location -> Location, (a, b) -> b));
+        return dealerRepository.getDealerProfileByCustomerNumberIn(keys).stream()
+                .collect(Collectors.toMap(key -> key.getCustomerNumber(), Location -> Location, (a, b) -> b));
     }
 
     private ImportTask getImportTask(Long importTaskId) {
@@ -325,9 +334,8 @@ public class VehicleItemWriter implements ItemWriter<FlatVehicleListing> {
                 .collect(Collectors.toMap(key -> key.getName().toLowerCase(), a -> a, (a, b) -> b));
     }
 
-    private Map<String, SellerType> getSellerTypeMap() {
-        return sellerTypeRepository.findAll().stream()
-                .collect(Collectors.toMap(key -> key.getName().toLowerCase(), a -> a, (a, b) -> b));
+    private SellerType getSellerType() {
+        return sellerTypeRepository.getById(DEALER_SELLER_TYPE_ID);
     }
 
     private Map<String, VehicleBodyType> getBodyTypeMap() {
@@ -352,7 +360,7 @@ public class VehicleItemWriter implements ItemWriter<FlatVehicleListing> {
 
     private Map<String, VehicleCategory> getCategoryMap() {
         return categoryRepository.findAll().stream()
-                .collect(Collectors.toMap(key -> key.getName().toLowerCase(), a -> a, (a, b) -> b));
+                .collect(Collectors.toMap(key -> key.getCode().toLowerCase(), a -> a, (a, b) -> b));
     }
 
 }

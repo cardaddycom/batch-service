@@ -16,7 +16,8 @@ public class VehicleItemWriterListener implements ItemWriteListener<FlatVehicleL
 
     @Override
     public void afterWrite(List<? extends FlatVehicleListing> list) {
-        log.info("afterWrite {}", list);
+//        log.info("afterWrite {}", list);
+        log.info("afterWrite");
     }
 
     @Override

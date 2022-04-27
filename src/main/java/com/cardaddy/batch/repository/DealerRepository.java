@@ -10,6 +10,6 @@ import java.util.Set;
 @Repository
 public interface DealerRepository extends JpaRepository<DealerProfile, Long> {
 
-    List<DealerProfile> getDealerProfileByIdIn(Set<Long> dealerIds);
+    List<DealerProfile> getDealerProfileByCustomerNumberIn(Set<String> dealerIds);
 
 }

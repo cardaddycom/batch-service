@@ -1,12 +1,9 @@
-
 package com.cardaddy.batch.model;
 
 import lombok.Data;
 
-/**
- *
- * @author george
- */
+import java.util.Date;
+
 @Data
 public class FlatVehicleListing {
 
@@ -18,8 +15,8 @@ public class FlatVehicleListing {
     private String description;
     private String vin;
     private String stockNumber;
-    private Long dealerId;
-    private Long partnerId;
+    private String dealerId;
+    private String partnerId;
     private String body;
     private String doors;
     private String exteriorColor;
@@ -59,18 +56,6 @@ public class FlatVehicleListing {
     private String sellerType;
     private String inventoryType;
     private String vehicleTitle;
+    private Date schedulerDate;
 
-
-    @Override
-    public String toString() {
-        return "FlatVehicleListing{" +
-                "year='" + year + '\'' +
-                ", make='" + make + '\'' +
-                ", model='" + model + '\'' +
-                ", trim='" + trim + '\'' +
-                ", vin='" + vin + '\'' +
-                ", stockNumber='" + stockNumber + '\'' +
-                ", dealerId='" + dealerId + '\'' +
-                '}';
-    }
 }

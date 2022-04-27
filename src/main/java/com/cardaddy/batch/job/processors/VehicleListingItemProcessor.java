@@ -4,6 +4,8 @@ import com.cardaddy.batch.model.FlatVehicleListing;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.item.ItemProcessor;
 
+import java.util.Date;
+
 @Slf4j
 public class VehicleListingItemProcessor implements ItemProcessor<FlatVehicleListing, FlatVehicleListing> {
 
@@ -12,6 +14,8 @@ public class VehicleListingItemProcessor implements ItemProcessor<FlatVehicleLis
         log.info("Vehicle Listing Item Processor {}", flatVehicleListing.getVin());
 
         flatVehicleListing.setVin(flatVehicleListing.getVin().toUpperCase());
+        flatVehicleListing.setSchedulerDate(new Date());
+        flatVehicleListing.setCategory("cars");
 
         return flatVehicleListing;
     }
