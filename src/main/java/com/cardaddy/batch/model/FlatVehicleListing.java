@@ -49,6 +49,7 @@ public class FlatVehicleListing {
     private String websiteListingUrl;
     private String category;
     private String title;
+    private String dateCreated;
 
     //Filled during the processor step
     private boolean dealix;
@@ -57,5 +58,7 @@ public class FlatVehicleListing {
     private String inventoryType;
     private String vehicleTitle;
     private Date schedulerDate;
+    private String exteriorColorCustom;
+    private String interiorColorCustom;
 
 }

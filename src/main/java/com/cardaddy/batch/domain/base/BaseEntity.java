@@ -15,7 +15,8 @@ public abstract class BaseEntity implements Serializable, TransitoryBaseEntity {
 
     @Id
     @GenericField(name = "id", sortable = Sortable.YES)
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seqGen")
+    @SequenceGenerator(name = "seqGen", sequenceName = "seq", initialValue = 1)
     private Long id;
 
     @Transient

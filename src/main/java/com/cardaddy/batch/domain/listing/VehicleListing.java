@@ -3,12 +3,10 @@ package com.cardaddy.batch.domain.listing;
 import com.cardaddy.batch.domain.account.DealerProfile;
 import com.cardaddy.batch.domain.account.PartnerProfile;
 import com.cardaddy.batch.domain.account.UserProfile;
-import com.cardaddy.batch.domain.base.BaseEntity;
 import com.cardaddy.batch.domain.location.Location;
 import com.cardaddy.batch.domain.lookup.*;
 import com.cardaddy.batch.domain.task.imports.ImportTask;
 import lombok.Data;
-import org.hibernate.annotations.Where;
 import org.hibernate.search.engine.backend.types.Aggregable;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.Sortable;
@@ -18,7 +16,6 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.*;
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.util.Date;
-import java.util.List;
 
 /**
  *
@@ -28,10 +25,16 @@ import java.util.List;
 @Entity
 @Indexed
 @Table(name = "vehicle_listing")
-public class VehicleListing extends BaseEntity {
+public class VehicleListing {
 
     private static final int ACTIVATE_KEY_LENGTH = 16;
     private final static String EMPTY_SPACE = " ";
+
+    @Id
+    @GenericField(name = "id", sortable = Sortable.YES)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seqGen")
+    @SequenceGenerator(name = "seqGen", sequenceName = "seq", initialValue = 1)
+    private Long id;
 
     private String exteriorColorCustom;
 
@@ -179,11 +182,6 @@ public class VehicleListing extends BaseEntity {
     @Column(nullable = false)
     @Temporal(TemporalType.TIMESTAMP)
     private Date schedulerDate;
-
-    @OneToMany(mappedBy = "vehicleListing", orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @OrderBy("orderBy")
-    @Where(clause = "active")
-    private List<Photo> photos;
 
     @Column(columnDefinition = "BIT", nullable = false)
     private boolean importVehicle;

@@ -1,15 +1,15 @@
 package com.cardaddy.batch.domain.task.imports;
 
 import com.cardaddy.batch.domain.base.StatefulEntity;
-import com.cardaddy.batch.domain.listing.VehicleListing;
 import com.cardaddy.batch.domain.task.lookup.FileType;
 import com.cardaddy.batch.domain.task.lookup.FtpAccount;
 import com.cardaddy.batch.domain.task.lookup.ImportSystem;
 import lombok.Data;
-import lombok.ToString;
 
-import javax.persistence.*;
-import java.util.List;
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 
 @Data
 @Entity
@@ -23,15 +23,15 @@ public class ImportTask extends StatefulEntity {
 
     private String customerFilename;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "file_type_id", nullable = false)
     private FileType fileType;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "import_system_id", nullable = false)
     private ImportSystem importSystem;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "ftp_account_id", nullable = false)
     private FtpAccount ftpAccount;
 

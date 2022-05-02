@@ -44,12 +44,6 @@ public class VehicleConfiguration extends StatefulEntity implements TransitoryLo
     @JoinColumn(name = "trim_id", nullable = true)
     private VehicleTrim vehicleTrim;
 
-    private String tempMake;
-
-    private String tempModel;
-
-    private String tempTrim;
-
     @OneToMany(mappedBy = "vehicleConfiguration", orphanRemoval = true, cascade = CascadeType.ALL)
     private List<VehicleListing> vehicleListings;
 

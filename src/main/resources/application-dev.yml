@@ -1,7 +1,14 @@
-spring:
-  jpa:
-    properties:
+logging:
+  level:
+    ROOT: error
+    com:
+      cardaddy:
+        batch: debug
+        batch.listener: error
+        batch.job.processors: error
+        batch.job.writer: debug
+        batch.ob.tasklet: debug
+    org:
       hibernate:
-        search:
-          backend:
-            uris: http://localhost:9200
+        SQL: error
+      springframework: error

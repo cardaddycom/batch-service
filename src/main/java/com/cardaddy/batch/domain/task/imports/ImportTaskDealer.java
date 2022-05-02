@@ -34,4 +34,7 @@ public class ImportTaskDealer extends StatefulEntity {
         return "ImportTaskDealer{" + "importTask=" + importTask  + '}';
     }
 
+    public ImportTaskDealer(ImportTask importTask) {
+        this.importTask = importTask;
+    }
 }
