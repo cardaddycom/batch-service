@@ -1,5 +1,6 @@
 package com.cardaddy.batch.config;
 
+import com.cardaddy.batch.domain.listing.VehicleListing;
 import com.cardaddy.batch.domain.task.imports.ImportTask;
 import com.cardaddy.batch.domain.task.lookup.ImportConfiguration;
 import com.cardaddy.batch.exception.MissingLocationException;
@@ -14,7 +15,6 @@ import com.cardaddy.batch.model.FlatCustomer;
 import com.cardaddy.batch.model.FlatVehicleListing;
 import com.cardaddy.batch.repository.ImportConfigurationRepository;
 import com.cardaddy.batch.repository.ImportTaskRepository;
-import com.cardaddy.batch.repository.listing.VehicleListing;
 import com.cardaddy.batch.service.CustomerColumnMappings;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +27,7 @@ import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.file.FlatFileItemReader;
+import org.springframework.batch.item.file.FlatFileParseException;
 import org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper;
 import org.springframework.batch.item.file.mapping.DefaultLineMapper;
 import org.springframework.batch.item.file.transform.DelimitedLineTokenizer;
@@ -119,6 +120,7 @@ public class JobBatchConfiguration {
     }
 
     @Bean
+    @StepScope
     public DeleteVehicleTasklet deleteVehicleTasklet() {
         return new DeleteVehicleTasklet();
     }
@@ -186,6 +188,7 @@ public class JobBatchConfiguration {
                 .listener(customerWriterListener())
                 .faultTolerant()
                 .skipLimit(1000)
+                .skip(FlatFileParseException.class)
                 .skip(MissingLocationException.class)
                 .build();
     }
@@ -211,9 +214,10 @@ public class JobBatchConfiguration {
     public FlatFileItemReader<FlatCustomer> customerReader(@Value("#{jobParameters['importTaskId']}") Long importTaskId,
                                                            ImportTaskRepository importTaskRepository,
                                                            ImportConfigurationRepository importConfigurationRepository) {
-        log.info("Flat File Item Reader Job {}", importTaskId);
+        log.info("Flat File Customer Reader Job {}", importTaskId);
 
         ImportTask importTask = importTaskRepository.findById(importTaskId).orElseThrow(() -> new NullPointerException("Import task Id " + importTaskId + " doesn't exist"));
+
         Map<Integer, String> customerMapping = customerColumnMappings.getCustomerMapping(importTask.getImportSystem().getName());
 
         int configSize = customerMapping.size();
@@ -235,6 +239,7 @@ public class JobBatchConfiguration {
         FlatFileItemReader reader = new FlatFileItemReader<>();
         reader.setResource(new FileSystemResource(filePath));
         reader.setLinesToSkip(1);
+        reader.setStrict(false);
 
         DefaultLineMapper lineMapper = new DefaultLineMapper<>();
 
@@ -270,10 +275,9 @@ public class JobBatchConfiguration {
     public FlatFileItemReader<FlatVehicleListing> vehicleReader(@Value("#{jobParameters['importTaskId']}") Long importTaskId,
                                                          ImportTaskRepository importTaskRepository,
                                                          ImportConfigurationRepository importConfigurationRepository) {
-        log.info("Flat File Item Reader Job {}", importTaskId);
+        log.info("Flat File Vehicle Reader Job {}", importTaskId);
 
-        ImportTask importTask = importTaskRepository.findById(importTaskId).orElseThrow(() -> new NullPointerException("Import task Id " + importTaskId + " doesn't exist"));
-
+        ImportTask importTask = importTaskRepository.getById(importTaskId);
         List<ImportConfiguration> configurationList = importConfigurationRepository.getImportConfiguration(importTask.getImportSystem().getId());
 
         int configSize = configurationList.size();

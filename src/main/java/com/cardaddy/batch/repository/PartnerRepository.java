@@ -5,11 +5,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Set;
 
 @Repository
 public interface PartnerRepository extends JpaRepository<PartnerProfile, Long> {
 
-    List<PartnerProfile> getPartnerProfileByIdIn(Set<Long> partnerIds);
+    List<PartnerProfile> getPartnerProfileByIdIn(List<Long> partnerIds);
 
 }

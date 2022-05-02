@@ -1,11 +1,11 @@
 package com.cardaddy.batch.domain.account;
 
 import com.cardaddy.batch.domain.base.BaseEntity;
+import com.cardaddy.batch.domain.listing.VehicleListing;
 import com.cardaddy.batch.domain.location.Location;
 import com.cardaddy.batch.domain.lookup.FranchiseType;
 import com.cardaddy.batch.domain.lookup.VehicleCategory;
 import com.cardaddy.batch.domain.task.imports.ImportTaskDealer;
-import com.cardaddy.batch.repository.listing.VehicleListing;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;

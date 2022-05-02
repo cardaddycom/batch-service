@@ -39,6 +39,7 @@ public class FtpGetRemoteFilesTasklet implements Tasklet, StepExecutionListener 
     public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
         log.info("DownLoadCsvFromFtpTasklet");
         ImportTask importTask = repository.getById(importTaskId);
+        log.debug("Import Task {}", importTask);
         fetchFileFromFTP(importTask);
         return RepeatStatus.FINISHED;
     }

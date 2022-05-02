@@ -120,13 +120,13 @@ public class CustomerWriter implements ItemWriter<FlatCustomer> {
 
     private Map<String, DealerProfile> getDealerMap(List<FlatCustomer> flatCustomers) {
         Set<String> keys = flatCustomers.stream().map(flatCustomer -> flatCustomer.getCustomerNumber().toLowerCase()).collect(Collectors.toSet());
-        return dealerRepository.getDealerProfileByCustomerNumberIn(keys).stream()
+        return dealerRepository.getDealerProfileByCustomerNumberIn(new ArrayList<>(keys)).stream()
                 .collect(Collectors.toMap(key -> key.getCustomerNumber().toLowerCase().trim(), dealerProfile -> dealerProfile, (a, b) -> b));
     }
 
     private Map<String, Location> getLocationMap(List<FlatCustomer> list) {
         Set<String> keys = list.stream().map(flatCustomer -> flatCustomer.getZipcode()).collect(Collectors.toSet());
-        return locationRepository.getLocationByZipIn(keys).stream()
+        return locationRepository.getLocationByZipIn(new ArrayList<>(keys)).stream()
                 .collect(Collectors.toMap(key -> key.getZip().toLowerCase().trim(), Location -> Location, (a, b) -> b));
     }
 

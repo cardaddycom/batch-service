@@ -1,9 +1,8 @@
-package com.cardaddy.batch.repository.listing;
+package com.cardaddy.batch.domain.listing;
 
 import com.cardaddy.batch.domain.account.DealerProfile;
 import com.cardaddy.batch.domain.account.PartnerProfile;
 import com.cardaddy.batch.domain.account.UserProfile;
-import com.cardaddy.batch.domain.base.BaseEntity;
 import com.cardaddy.batch.domain.location.Location;
 import com.cardaddy.batch.domain.lookup.*;
 import com.cardaddy.batch.domain.task.imports.ImportTask;
@@ -26,16 +25,16 @@ import java.util.Date;
 @Entity
 @Indexed
 @Table(name = "vehicle_listing")
-public class VehicleListing extends BaseEntity {
+public class VehicleListing {
 
     private static final int ACTIVATE_KEY_LENGTH = 16;
     private final static String EMPTY_SPACE = " ";
-//
-//    @Id
-//    @GenericField(name = "id", sortable = Sortable.YES)
-//    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seqGen")
-//    @SequenceGenerator(name = "seqGen", sequenceName = "seq", initialValue = 1)
-//    private Long id;
+
+    @Id
+    @GenericField(name = "id", sortable = Sortable.YES)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seqGen")
+    @SequenceGenerator(name = "seqGen", sequenceName = "seq", initialValue = 1)
+    private Long id;
 
     private String exteriorColorCustom;
 
@@ -82,7 +81,7 @@ public class VehicleListing extends BaseEntity {
 
     @IndexingDependency(reindexOnUpdate = ReindexOnUpdate.SHALLOW)
     @IndexedEmbedded(includeDepth = 1)
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne
     @JoinColumn(name = "vehicle_trim_id", nullable = true)
     private VehicleTrim vehicleTrim;
 
@@ -92,51 +91,51 @@ public class VehicleListing extends BaseEntity {
     @JoinColumn(name = "vehicle_category_id", nullable = false)
     private VehicleCategory vehicleCategory;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne
     @JoinColumn(name = "vehicle_configuration_id", nullable = true)
     private VehicleConfiguration vehicleConfiguration;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne
     @JoinColumn(name = "user_profile_id", nullable = true)
     private UserProfile userProfile;
 
     @IndexedEmbedded(includeDepth = 1)
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne
     @JoinColumn(name = "dealer_profile_id", nullable = true)
     private DealerProfile dealerProfile;
 
     @IndexedEmbedded(includeDepth = 1)
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne
     @JoinColumn(name = "partner_profile_id", nullable = true)
     private PartnerProfile partnerProfile;
 
     @IndexingDependency(reindexOnUpdate = ReindexOnUpdate.SHALLOW)
     @IndexedEmbedded
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne
     @JoinColumn(name = "body_type_id", nullable = true)
     private VehicleBodyType bodyType;
 
     @IndexingDependency(reindexOnUpdate = ReindexOnUpdate.SHALLOW)
     @IndexedEmbedded
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne
     @JoinColumn(name = "transmission_id", nullable = true)
     private VehicleTransmission transmission;
 
     @IndexingDependency(reindexOnUpdate = ReindexOnUpdate.SHALLOW)
     @IndexedEmbedded
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne
     @JoinColumn(name = "exterior_color_id", nullable = true)
     private VehicleColor exteriorColor;
 
     @IndexingDependency(reindexOnUpdate = ReindexOnUpdate.SHALLOW)
     @IndexedEmbedded
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne
     @JoinColumn(name = "interior_color_id", nullable = true)
     private VehicleColor interiorColor;
 
     @IndexingDependency(reindexOnUpdate = ReindexOnUpdate.SHALLOW)
     @IndexedEmbedded
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne
     @JoinColumn(name = "condition_id", nullable = true)
     private VehicleCondition condition;
 
@@ -186,6 +185,8 @@ public class VehicleListing extends BaseEntity {
 
     @Column(columnDefinition = "BIT", nullable = false)
     private boolean importVehicle;
+
+    private Long jobExecutionId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "import_task_id", nullable = true)

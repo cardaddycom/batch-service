@@ -2,7 +2,7 @@ package com.cardaddy.batch.domain.lookup;
 
 import com.cardaddy.batch.domain.base.StatefulEntity;
 import com.cardaddy.batch.domain.base.TransitoryLookup;
-import com.cardaddy.batch.repository.listing.VehicleListing;
+import com.cardaddy.batch.domain.listing.VehicleListing;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 

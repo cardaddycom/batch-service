@@ -2,13 +2,15 @@ package com.cardaddy.batch.job.writer;
 
 import com.cardaddy.batch.domain.account.DealerProfile;
 import com.cardaddy.batch.domain.account.PartnerProfile;
+import com.cardaddy.batch.domain.listing.VehicleListing;
 import com.cardaddy.batch.domain.location.Location;
 import com.cardaddy.batch.domain.lookup.*;
 import com.cardaddy.batch.domain.task.imports.ImportTask;
 import com.cardaddy.batch.model.FlatVehicleListing;
 import com.cardaddy.batch.repository.*;
-import com.cardaddy.batch.repository.listing.VehicleListing;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.annotation.BeforeStep;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -57,16 +59,25 @@ public class VehicleItemWriter implements ItemWriter<FlatVehicleListing> {
     @Value("#{jobParameters['importTaskId']}")
     private Long importTaskId;
 
+    private StepExecution stepExecution;
+
+    @BeforeStep
+    public void beforeStep(StepExecution stepExecution) {
+        this.stepExecution = stepExecution;
+    }
+
     @Override
     public void write(List<? extends FlatVehicleListing> flatVehicleListings) throws Exception {
         List<FlatVehicleListing> listings = (List<FlatVehicleListing>) flatVehicleListings;
 
         List<String> vinNumbers = listings.stream().map(vehicleListing -> vehicleListing.getVin()).collect(Collectors.toList());
+        log.debug("existing vehicles start");
         List<VehicleListing> existingVehicles = vehicleListingRepository.getVehicleListingByVinIn(vinNumbers);
 
         var existingVehiclesMap =
                 existingVehicles.stream().collect(Collectors.toMap(key -> key.getVin().toLowerCase(), vehicleListing -> vehicleListing, (a, b) -> b));
-
+        log.debug("existing vehicles end");
+        log.debug("lookup data start");
         var yearMap = createOrUpdateYear(listings);
         var makeMap = createOrUpdateMake(listings);
         var modelMap = createOrUpdateModel(listings);
@@ -80,6 +91,7 @@ public class VehicleItemWriter implements ItemWriter<FlatVehicleListing> {
         var categoryMap = getCategoryMap();
         var dealerMap = getDealerMap(listings);
         var locationMap = getLocationMap(listings);
+        log.debug("lookup data end");
 
         var importTask = getImportTask(importTaskId);
 
@@ -143,6 +155,7 @@ public class VehicleItemWriter implements ItemWriter<FlatVehicleListing> {
             vehicleListing.setCreateDate(new Date());
         }
 
+        vehicleListing.setJobExecutionId(stepExecution.getJobExecution().getJobId());
         vehicleListing.setSchedulerDate(flatVehicleListing.getSchedulerDate());
         vehicleListing.setExteriorColorCustom(flatVehicleListing.getExteriorColorCustom());
         vehicleListing.setInteriorColorCustom(flatVehicleListing.getInteriorColorCustom());
@@ -158,7 +171,6 @@ public class VehicleItemWriter implements ItemWriter<FlatVehicleListing> {
         vehicleListing.setVehicleModel(model);
         vehicleListing.setVehicleTrim(trim);
         vehicleListing.setVehicleCategory(category);
-//        vehicleListing.setVehicleConfiguration();
         vehicleListing.setDealerProfile(dealer);
         vehicleListing.setPartnerProfile(partner);
         vehicleListing.setBodyType(bodyType);
@@ -169,7 +181,6 @@ public class VehicleItemWriter implements ItemWriter<FlatVehicleListing> {
         vehicleListing.setDescription(flatVehicleListing.getDescription());
 
         vehicleListing.setPrice(new BigDecimal(flatVehicleListing.getSellingPrice()));
-//        vehicleListing.setPartnerUrl(flatVehicleListing.);
         vehicleListing.setVin(flatVehicleListing.getVin());
         vehicleListing.setMileage(Integer.valueOf(flatVehicleListing.getMileage()));
         vehicleListing.setPhone(flatVehicleListing.getPhone());
@@ -205,7 +216,7 @@ public class VehicleItemWriter implements ItemWriter<FlatVehicleListing> {
     private Map<String, VehicleMake> createOrUpdateMake(List<FlatVehicleListing> list) {
         Set<String> keys = list.stream().map(vehicleListing -> vehicleListing.getMake()).collect(Collectors.toSet());
 
-        List<VehicleMake> existingVehicles = vehicleMakeRepository.getVehicleMakeByNameIn(keys);
+        List<VehicleMake> existingVehicles = vehicleMakeRepository.getVehicleMakeByNameIn(new ArrayList<>(keys));
 
         Map<String, VehicleMake> existingItemsMap =
                 existingVehicles.stream().collect(Collectors.toMap(key -> key.getName().toLowerCase(), vehicleMake -> vehicleMake, (a, b) -> b));
@@ -234,7 +245,7 @@ public class VehicleItemWriter implements ItemWriter<FlatVehicleListing> {
     private Map<String, VehicleModel> createOrUpdateModel(List<FlatVehicleListing> list) {
         Set<String> keys = list.stream().map(vehicleListing -> vehicleListing.getModel()).collect(Collectors.toSet());
 
-        List<VehicleModel> existingVehicles = vehicleModelRepository.getVehicleModelByNameIn(keys);
+        List<VehicleModel> existingVehicles = vehicleModelRepository.getVehicleModelByNameIn(new ArrayList<>(keys));
 
         Map<String, VehicleModel> existingItemsMap =
                 existingVehicles.stream().collect(Collectors.toMap(key -> key.getName().toLowerCase(), VehicleModel -> VehicleModel, (a, b) -> b));
@@ -263,7 +274,7 @@ public class VehicleItemWriter implements ItemWriter<FlatVehicleListing> {
     private Map<String, VehicleTrim> createOrUpdateTrim(List<FlatVehicleListing> list) {
         Set<String> keys = list.stream().map(vehicleListing -> vehicleListing.getTrim()).collect(Collectors.toSet());
 
-        List<VehicleTrim> existingVehicles = vehicleTrimRepository.getVehicleTrimByNameIn(keys);
+        List<VehicleTrim> existingVehicles = vehicleTrimRepository.getVehicleTrimByNameIn(new ArrayList<>(keys));
 
         Map<String, VehicleTrim> existingItemsMap =
                 existingVehicles.stream().collect(Collectors.toMap(key -> key.getName().trim().toLowerCase(), VehicleTrim -> VehicleTrim, (a, b) -> b));
@@ -294,7 +305,7 @@ public class VehicleItemWriter implements ItemWriter<FlatVehicleListing> {
     private Map<String, VehicleYear> createOrUpdateYear(List<FlatVehicleListing> list) {
         Set<String> keys = list.stream().map(vehicleListing -> vehicleListing.getYear()).collect(Collectors.toSet());
 
-        List<VehicleYear> existingVehicles = vehicleYearRepository.getVehicleYearByNameIn(keys);
+        List<VehicleYear> existingVehicles = vehicleYearRepository.getVehicleYearByNameIn(new ArrayList<>(keys));
 
         Map<String, VehicleYear> existingItemsMap =
                 existingVehicles.stream().collect(Collectors.toMap(key -> key.getName().toLowerCase(), VehicleYear -> VehicleYear, (a, b) -> b));
@@ -324,13 +335,13 @@ public class VehicleItemWriter implements ItemWriter<FlatVehicleListing> {
 
     private Map<String, Location> getLocationMap(List<FlatVehicleListing> list) {
         Set<String> keys = list.stream().map(vehicleListing -> vehicleListing.getZipcode()).collect(Collectors.toSet());
-        return locationRepository.getLocationByZipIn(keys).stream()
+        return locationRepository.getLocationByZipIn(new ArrayList<>(keys)).stream()
                 .collect(Collectors.toMap(key -> key.getZip().toLowerCase().trim(), Location -> Location, (a, b) -> b));
     }
 
     private Map<String, DealerProfile> getDealerMap(List<FlatVehicleListing> list) {
         Set<String> keys = list.stream().map(vehicleListing -> vehicleListing.getDealerId()).collect(Collectors.toSet());
-        return dealerRepository.getDealerProfileByCustomerNumberIn(keys).stream()
+        return dealerRepository.getDealerProfileByCustomerNumberIn(new ArrayList<>(keys)).stream()
                 .collect(Collectors.toMap(key -> key.getCustomerNumber().toLowerCase().trim(), dealerProfile -> dealerProfile, (a, b) -> b));
     }
 
