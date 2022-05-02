@@ -5,6 +5,7 @@ import com.cardaddy.batch.domain.location.Location;
 import com.cardaddy.batch.domain.lookup.VehicleCategory;
 import com.cardaddy.batch.domain.task.imports.ImportTask;
 import com.cardaddy.batch.domain.task.imports.ImportTaskDealer;
+import com.cardaddy.batch.exception.MissingLocationException;
 import com.cardaddy.batch.model.FlatCustomer;
 import com.cardaddy.batch.repository.*;
 import lombok.extern.slf4j.Slf4j;
@@ -56,6 +57,7 @@ public class CustomerWriter implements ItemWriter<FlatCustomer> {
                 dealerProfile.setLeadEmail("detroittrader@cardaddy.com");
                 dealerProfile.setOwnerFirstName("Car");
                 dealerProfile.setOwnerLastName("Daddy");
+
                 dealerProfile.setProfileDomain(buildProfileDomain(flatCustomer, locationMap.get(flatCustomer.getZipcode())));
             }
 
@@ -69,20 +71,35 @@ public class CustomerWriter implements ItemWriter<FlatCustomer> {
 
             dealerProfile.setPricingTier(flatCustomer.getPricingTier());
             dealerProfile.setStreetAddress1(flatCustomer.getAddress1());
-            log.debug("zip {}", flatCustomer.getZipcode());
-            log.debug("location {}", locationMap.get(flatCustomer.getZipcode()).getZip());
-            dealerProfile.setZipDetail(locationMap.get(flatCustomer.getZipcode()));
+
+            if(locationMap.containsKey(flatCustomer.getZipcode())) {
+                dealerProfile.setZipDetail(locationMap.get(flatCustomer.getZipcode()));
+            } else {
+                log.debug("missing location {}", flatCustomer.getZipcode());
+                throw new MissingLocationException("Missing location " + flatCustomer.getZipcode());
+            }
+
             dealerProfile.setVehicleCategory(category);
 
-            ImportTaskDealer importTaskDealer = getImportTaskDealer(dealerProfile, importTask);
-            importTaskDealer.setDmsId(flatCustomer.getCustomerNumber());
-            importTaskDealer.setActive(true);
             dealerRepository.save(dealerProfile);
-            importTaskDealerRepository.save(importTaskDealer);
-
+            dealerRepository.flush();
 
             dealerProfiles.add(dealerProfile);
         });
+
+//        dealerRepository.saveAll(dealerProfiles);
+
+
+        List<ImportTaskDealer> importTaskDealers = new ArrayList<>();
+
+        for(DealerProfile dealerProfile : dealerProfiles) {
+            ImportTaskDealer importTaskDealer = getImportTaskDealer(dealerProfile, importTask);
+            importTaskDealer.setDmsId(dealerProfile.getCustomerNumber());
+            importTaskDealer.setActive(true);
+            importTaskDealers.add(importTaskDealer);
+        }
+
+        importTaskDealerRepository.saveAll(importTaskDealers);
 
     }
 

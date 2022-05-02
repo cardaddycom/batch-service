@@ -2,12 +2,12 @@ package com.cardaddy.batch.job.writer;
 
 import com.cardaddy.batch.domain.account.DealerProfile;
 import com.cardaddy.batch.domain.account.PartnerProfile;
-import com.cardaddy.batch.domain.listing.VehicleListing;
 import com.cardaddy.batch.domain.location.Location;
 import com.cardaddy.batch.domain.lookup.*;
 import com.cardaddy.batch.domain.task.imports.ImportTask;
 import com.cardaddy.batch.model.FlatVehicleListing;
 import com.cardaddy.batch.repository.*;
+import com.cardaddy.batch.repository.listing.VehicleListing;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.beans.factory.annotation.Autowired;

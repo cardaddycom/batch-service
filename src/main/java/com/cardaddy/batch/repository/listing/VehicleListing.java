@@ -1,8 +1,9 @@
-package com.cardaddy.batch.domain.listing;
+package com.cardaddy.batch.repository.listing;
 
 import com.cardaddy.batch.domain.account.DealerProfile;
 import com.cardaddy.batch.domain.account.PartnerProfile;
 import com.cardaddy.batch.domain.account.UserProfile;
+import com.cardaddy.batch.domain.base.BaseEntity;
 import com.cardaddy.batch.domain.location.Location;
 import com.cardaddy.batch.domain.lookup.*;
 import com.cardaddy.batch.domain.task.imports.ImportTask;
@@ -25,16 +26,16 @@ import java.util.Date;
 @Entity
 @Indexed
 @Table(name = "vehicle_listing")
-public class VehicleListing {
+public class VehicleListing extends BaseEntity {
 
     private static final int ACTIVATE_KEY_LENGTH = 16;
     private final static String EMPTY_SPACE = " ";
-
-    @Id
-    @GenericField(name = "id", sortable = Sortable.YES)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seqGen")
-    @SequenceGenerator(name = "seqGen", sequenceName = "seq", initialValue = 1)
-    private Long id;
+//
+//    @Id
+//    @GenericField(name = "id", sortable = Sortable.YES)
+//    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seqGen")
+//    @SequenceGenerator(name = "seqGen", sequenceName = "seq", initialValue = 1)
+//    private Long id;
 
     private String exteriorColorCustom;
 

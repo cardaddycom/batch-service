@@ -27,6 +27,7 @@ public class VehicleListingItemProcessor implements ItemProcessor<FlatVehicleLis
         listing.setOptions(listing.getOptions().replaceAll("\\xFFFD", ""));
         listing.setOptions(listing.getOptions().replaceAll("[^\\x20-\\x7e]", ""));
 
+        listing.setInteriorColorCustom(listing.getInteriorColorCustom().replaceAll("[^\\x20-\\x7e]", ""));
 
         return listing;
     }

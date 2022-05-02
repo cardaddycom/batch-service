@@ -1,8 +1,8 @@
 package com.cardaddy.batch.config;
 
-import com.cardaddy.batch.domain.listing.VehicleListing;
 import com.cardaddy.batch.domain.task.imports.ImportTask;
 import com.cardaddy.batch.domain.task.lookup.ImportConfiguration;
+import com.cardaddy.batch.exception.MissingLocationException;
 import com.cardaddy.batch.job.processors.*;
 import com.cardaddy.batch.job.tasklet.DeleteVehicleTasklet;
 import com.cardaddy.batch.job.tasklet.FtpGetRemoteFilesTasklet;
@@ -14,6 +14,7 @@ import com.cardaddy.batch.model.FlatCustomer;
 import com.cardaddy.batch.model.FlatVehicleListing;
 import com.cardaddy.batch.repository.ImportConfigurationRepository;
 import com.cardaddy.batch.repository.ImportTaskRepository;
+import com.cardaddy.batch.repository.listing.VehicleListing;
 import com.cardaddy.batch.service.CustomerColumnMappings;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -72,6 +73,11 @@ public class JobBatchConfiguration {
     @Bean
     public VehicleItemWriterListener vehicleItemWriterListener() {
         return new VehicleItemWriterListener();
+    }
+
+    @Bean
+    public VehicleItemProcessorListener vehicleItemProcessorListener() {
+        return new VehicleItemProcessorListener();
     }
 
     @Bean
@@ -165,7 +171,7 @@ public class JobBatchConfiguration {
                 .writer(vehicleWriter())
                 .listener(vehicleReaderListener())
                 .listener(vehicleItemWriterListener())
-                .listener(customerProcessorListener())
+                .listener(vehicleItemProcessorListener())
                 .build();
     }
 
@@ -178,6 +184,9 @@ public class JobBatchConfiguration {
                 .writer(customerWriter())
                 .listener(customerReaderListener())
                 .listener(customerWriterListener())
+                .faultTolerant()
+                .skipLimit(1000)
+                .skip(MissingLocationException.class)
                 .build();
     }
 

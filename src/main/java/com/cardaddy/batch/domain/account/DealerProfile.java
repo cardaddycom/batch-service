@@ -1,13 +1,14 @@
 package com.cardaddy.batch.domain.account;
 
 import com.cardaddy.batch.domain.base.BaseEntity;
-import com.cardaddy.batch.domain.listing.VehicleListing;
 import com.cardaddy.batch.domain.location.Location;
 import com.cardaddy.batch.domain.lookup.FranchiseType;
 import com.cardaddy.batch.domain.lookup.VehicleCategory;
 import com.cardaddy.batch.domain.task.imports.ImportTaskDealer;
+import com.cardaddy.batch.repository.listing.VehicleListing;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.mapper.pojo.automaticindexing.ReindexOnUpdate;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.*;
@@ -24,6 +25,7 @@ import java.util.List;
 @Setter
 @Entity
 @Indexed
+@ToString(exclude = {"userProfiles", "vehicleListings", "vehicleCategory", "importTaskDealers"})
 @Table(name = "dealer_profile")
 public class DealerProfile extends BaseEntity {
 
@@ -88,7 +90,6 @@ public class DealerProfile extends BaseEntity {
 
     @IndexingDependency(reindexOnUpdate = ReindexOnUpdate.SHALLOW)
     @IndexedEmbedded
-
     @ManyToOne
     @JoinColumn(name = "vehicle_category_id", nullable = false)
     private VehicleCategory vehicleCategory;
@@ -121,5 +122,6 @@ public class DealerProfile extends BaseEntity {
 
     @OneToMany(mappedBy = "dealerProfile", orphanRemoval = true, cascade = CascadeType.ALL)
     private List<FranchiseType> franchiseTypes;
+
 
 }

@@ -8,7 +8,7 @@ import org.springframework.batch.core.ItemProcessListener;
 public class CustomerProcessorListener implements ItemProcessListener<FlatCustomer, FlatCustomer> {
 
     @Override
-    public void beforeProcess(FlatCustomer vehicleListing) {
+    public void beforeProcess(FlatCustomer flatCustomer) {
         log.info("beforeProcess");
     }
 

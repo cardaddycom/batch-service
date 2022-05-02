@@ -2,8 +2,8 @@
 package com.cardaddy.batch.domain.account;
 
 import com.cardaddy.batch.domain.base.StatefulEntity;
-import com.cardaddy.batch.domain.listing.VehicleListing;
 import com.cardaddy.batch.domain.location.Location;
+import com.cardaddy.batch.repository.listing.VehicleListing;
 import lombok.Data;
 
 import javax.persistence.*;

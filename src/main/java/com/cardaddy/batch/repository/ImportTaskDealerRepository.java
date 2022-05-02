@@ -9,6 +9,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ImportTaskDealerRepository extends JpaRepository<ImportTaskDealer, Long> {
 
-    public ImportTaskDealer findByDealerProfileAndImportTask(DealerProfile dealerProfile, ImportTask importTask);
+    ImportTaskDealer findByDealerProfileAndImportTask(DealerProfile dealerProfile, ImportTask importTask);
 
 }
