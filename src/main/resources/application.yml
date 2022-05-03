@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: jdbc:mysql://${MYSQL_HOST:localhost}:${MYSQL_PORT:3306}/${MYSQL_DB:cardaddy}
-    username: ${MYSQL_USERNAME:root}
-    password: ${MYSQL_PASSWORD:password}
+    url: jdbc:mysql://${MYSQL_HOST:cardaddy.cmfwd2v5fdjs.us-east-1.rds.amazonaws.com}:${MYSQL_PORT:3306}/${MYSQL_DB:cardaddy}
+    username: ${MYSQL_USERNAME:cardaddy_search_user}
+    password: ${MYSQL_PASSWORD:f_B4rHYbq?Dsx85%FBN53nREF/YWzw}
   batch:
     jdbc:
       initialize-schema: never
@@ -24,7 +24,7 @@ spring:
         dialect: org.hibernate.dialect.MySQL5InnoDBDialect
         search:
           backend:
-            uris: ${AWS_OPENSEARCH_URIS:http://localhost:9200}
+            uris: ${AWS_OPENSEARCH_URIS:https://search-cardaddy-search-x4exyj2l24mf5of3pto5nt5tvm.us-east-1.es.amazonaws.com}
             analysis:
               configurer: com.cardaddy.batch.CardaddyElasticsearchAnalysisConfigurer
           schema_management:

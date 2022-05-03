@@ -7,21 +7,22 @@ spring:
             aws:
               signing:
                 enabled: true
-              region: ${AWS_REGION}
+              region: ${AWS_REGION:us-east-1}
               credentials:
                 type: static
-                access_key_id: ${AWS_ACCESS_KEY_ID}
-                secret_access_key: ${AWS_SECRET_ACCESS_KEY}
-ogging:
+                access_key_id: ${AWS_ACCESS_KEY_ID:AKIA5X3IEG74BTKKCQ52}
+                secret_access_key: ${AWS_SECRET_ACCESS_KEY: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}
+logging:
   level:
     ROOT: error
     com:
       cardaddy:
-        batch: info
-        batch.listener: error
-        batch.job.processors: error
-        batch.job.writer: error
-        batch.ob.tasklet: error
+        batch:
+          listener: error
+          job:
+            processors: error
+            writer: info
+            tasklet: info
     org:
       hibernate:
         SQL: error
