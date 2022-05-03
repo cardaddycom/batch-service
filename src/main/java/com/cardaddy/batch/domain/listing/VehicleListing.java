@@ -33,7 +33,7 @@ public class VehicleListing {
     @Id
     @GenericField(name = "id", sortable = Sortable.YES)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seqGen")
-    @SequenceGenerator(name = "seqGen", sequenceName = "seq", initialValue = 1)
+    @SequenceGenerator(name = "seqGen", sequenceName = "seq", allocationSize = 30)
     private Long id;
 
     private String exteriorColorCustom;

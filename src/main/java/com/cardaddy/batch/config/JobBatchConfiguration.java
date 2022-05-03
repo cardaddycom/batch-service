@@ -126,6 +126,12 @@ public class JobBatchConfiguration {
     }
 
     @Bean
+    @StepScope
+    public VehicleListingItemProcessor vehicleListingItemProcessor() {
+        return new VehicleListingItemProcessor();
+    }
+
+    @Bean
     public Step ftpGetRemoteFilesStep() {
         return this.stepBuilderFactory.get("ftpGetRemoteFilesStep")
                 .tasklet(ftpGetRemoteFilesTasklet())
@@ -201,7 +207,7 @@ public class JobBatchConfiguration {
         delegates.add(new PhotoItemProcessor());
         delegates.add(new TransmissionItemProcessor());
         delegates.add(new VehicleCategoryProcessor());
-        delegates.add(new VehicleListingItemProcessor());
+        delegates.add(vehicleListingItemProcessor());
 
         CompositeItemProcessor processor = new CompositeItemProcessor();
         processor.setDelegates(delegates);

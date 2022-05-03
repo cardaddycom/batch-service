@@ -3,11 +3,17 @@ package com.cardaddy.batch.job.processors;
 import com.cardaddy.batch.model.FlatVehicleListing;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.item.ItemProcessor;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.util.Date;
 
 @Slf4j
 public class VehicleListingItemProcessor implements ItemProcessor<FlatVehicleListing, FlatVehicleListing> {
+
+    private static final long DETROIT_TRADER_ID = 20006;
+
+    @Value("#{jobParameters['importTaskId']}")
+    private Long importTaskId;
 
     @Override
     public FlatVehicleListing process(FlatVehicleListing listing) throws Exception {
@@ -28,6 +34,9 @@ public class VehicleListingItemProcessor implements ItemProcessor<FlatVehicleLis
         listing.setOptions(listing.getOptions().replaceAll("[^\\x20-\\x7e]", ""));
 
         listing.setInteriorColorCustom(listing.getInteriorColorCustom().replaceAll("[^\\x20-\\x7e]", ""));
+        listing.setExteriorColorCustom(listing.getExteriorColorCustom().replaceAll("[^\\x20-\\x7e]", ""));
+        listing.setDetroitTrader(DETROIT_TRADER_ID == importTaskId);
+        listing.setPhotoURLs(listing.getPhotoURLs().replaceAll("\\|", ","));
 
         return listing;
     }
