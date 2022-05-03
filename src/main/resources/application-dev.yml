@@ -6,17 +6,16 @@ spring:
           backend:
             uris: http://localhost:9200
     show-sql: false
-logging:
+ogging:
   level:
     ROOT: error
     com:
       cardaddy:
-        batch:
-          listener: error
-          job:
-            processors: error
-            writer: debug
-            tasklet: info
+        batch: debug
+        batch.listener: error
+        batch.job.processors: error
+        batch.job.writer: debug
+        batch.ob.tasklet: debug
     org:
       hibernate:
         SQL: error

@@ -126,7 +126,7 @@ public class VehicleItemWriter implements ItemWriter<FlatVehicleListing> {
             }
         }
 
-        log.info("Saving Vehicles {}", vehicleListings.size());
+        log.debug("Saving Vehicles {}", vehicleListings.size());
         vehicleListingRepository.saveAll(vehicleListings);
         vehicleListingRepository.flush();
 
@@ -154,6 +154,7 @@ public class VehicleItemWriter implements ItemWriter<FlatVehicleListing> {
         if(vehicleListing.getId() == null) {
             vehicleListing.setCreateDate(new Date());
         }
+
         vehicleListing.setJobExecutionId(stepExecution.getJobExecution().getJobId());
         vehicleListing.setSchedulerDate(flatVehicleListing.getSchedulerDate());
         vehicleListing.setExteriorColorCustom(flatVehicleListing.getExteriorColorCustom());
