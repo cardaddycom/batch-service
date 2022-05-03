@@ -4,7 +4,6 @@ spring:
       hibernate:
         search:
           backend:
-            uris: ${AWS_OPENSEARCH_URIS}
             aws:
               signing:
                 enabled: true

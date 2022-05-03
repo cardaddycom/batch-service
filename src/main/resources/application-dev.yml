@@ -1,4 +1,12 @@
-logging:
+spring:
+  jpa:
+    properties:
+      hibernate:
+        search:
+          backend:
+            uris: http://localhost:9200
+    show-sql: false
+ogging:
   level:
     ROOT: error
     com:

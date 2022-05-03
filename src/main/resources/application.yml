@@ -5,7 +5,7 @@ spring:
     password: ${MYSQL_PASSWORD:password}
   batch:
     jdbc:
-      initialize-schema: always
+      initialize-schema: never
     job:
       enabled: false
   jpa:
@@ -24,7 +24,7 @@ spring:
         dialect: org.hibernate.dialect.MySQL5InnoDBDialect
         search:
           backend:
-            uris: http://localhost:9200
+            uris: ${AWS_OPENSEARCH_URIS:http://localhost:9200}
             analysis:
               configurer: com.cardaddy.batch.CardaddyElasticsearchAnalysisConfigurer
           schema_management:
@@ -32,11 +32,3 @@ spring:
 
 ftp:
   root: ${FTP_ROOT:/ftp}
-#logging:
-#  level:
-#    ROOT: error
-#    com.cardaddy.batch: debug
-#    org:
-#      hibernate:
-#        SQL: error
-#      springframework: error
