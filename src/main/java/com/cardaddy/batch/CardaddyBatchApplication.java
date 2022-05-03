@@ -44,7 +44,7 @@ public class CardaddyBatchApplication implements ApplicationRunner {
 
             JobExecution execution = jobLauncher.run(importVehicleJob, jobParameters);
             log.info("Exit Status : {}", execution.getStatus());
-            System.exit(-1);
+            System.exit(0);
         } catch (Exception e) {
             e.printStackTrace();
         }
