@@ -35,10 +35,12 @@ public class UnZipFileTasklet implements Tasklet {
     public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
         ImportTask importTask = repository.getById(importTaskId);
 
-        Path source = Paths.get(String.format(String.format("%s/%s/home/%s", root, importTask.getFtpAccount().getId(), importTask.getZipFilename())));
-        Path target = Paths.get(String.format(String.format("%s/%s/home/", root, importTask.getFtpAccount().getId())));
+        if(importTask.isZipfile()) {
+            Path source = Paths.get(String.format(String.format("%s/%s/home/%s", root, importTask.getFtpAccount().getId(), importTask.getZipFilename())));
+            Path target = Paths.get(String.format(String.format("%s/%s/home/", root, importTask.getFtpAccount().getId())));
 
-        unzipFolder(source, target);
+            unzipFolder(source, target);
+        }
 
         return RepeatStatus.FINISHED;
     }
