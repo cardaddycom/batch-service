@@ -2,10 +2,12 @@ package com.cardaddy.batch.job.writer;
 
 import com.cardaddy.batch.domain.account.DealerProfile;
 import com.cardaddy.batch.domain.account.PartnerProfile;
+import com.cardaddy.batch.domain.base.StatefulEntity;
 import com.cardaddy.batch.domain.listing.VehicleListing;
 import com.cardaddy.batch.domain.location.Location;
 import com.cardaddy.batch.domain.lookup.*;
 import com.cardaddy.batch.domain.task.imports.ImportTask;
+import com.cardaddy.batch.domain.task.imports.ImportTaskDealer;
 import com.cardaddy.batch.model.FlatVehicleListing;
 import com.cardaddy.batch.repository.*;
 import lombok.extern.slf4j.Slf4j;
@@ -74,6 +76,7 @@ public class VehicleItemWriter implements ItemWriter<FlatVehicleListing> {
         log.debug("existing vehicles start");
         List<VehicleListing> existingVehicles = vehicleListingRepository.getVehicleListingByVinIn(vinNumbers);
 
+        var importTask = getImportTask(importTaskId);
         var existingVehiclesMap =
                 existingVehicles.stream().collect(Collectors.toMap(key -> key.getVin().toLowerCase(), vehicleListing -> vehicleListing, (a, b) -> b));
         log.debug("existing vehicles end");
@@ -89,11 +92,9 @@ public class VehicleItemWriter implements ItemWriter<FlatVehicleListing> {
         var conditionMap = getConditionMap();
         var colorMap = getColorMap();
         var categoryMap = getCategoryMap();
-        var dealerMap = getDealerMap(listings);
+        var dealerMap = getDealerMap(importTask);
         var locationMap = getLocationMap(listings);
         log.debug("lookup data end");
-
-        var importTask = getImportTask(importTaskId);
 
         List<VehicleListing> vehicleListings = new ArrayList<>();
 
@@ -179,7 +180,11 @@ public class VehicleItemWriter implements ItemWriter<FlatVehicleListing> {
         vehicleListing.setCondition(condition);
         vehicleListing.setDescription(flatVehicleListing.getDescription());
 
-        vehicleListing.setPrice(new BigDecimal(flatVehicleListing.getSellingPrice()));
+        try {
+            vehicleListing.setPrice(new BigDecimal(flatVehicleListing.getSellingPrice()));
+        } catch (NumberFormatException ex) {
+            vehicleListing.setPrice(BigDecimal.ZERO);
+        }
         vehicleListing.setVin(flatVehicleListing.getVin());
         vehicleListing.setMileage(Integer.valueOf(flatVehicleListing.getMileage()));
         vehicleListing.setPhone(flatVehicleListing.getPhone());
@@ -338,10 +343,9 @@ public class VehicleItemWriter implements ItemWriter<FlatVehicleListing> {
                 .collect(Collectors.toMap(key -> key.getZip().toLowerCase().trim(), Location -> Location, (a, b) -> b));
     }
 
-    private Map<String, DealerProfile> getDealerMap(List<FlatVehicleListing> list) {
-        Set<String> keys = list.stream().map(vehicleListing -> vehicleListing.getDealerId()).collect(Collectors.toSet());
-        return dealerRepository.getDealerProfileByCustomerNumberIn(new ArrayList<>(keys)).stream()
-                .collect(Collectors.toMap(key -> key.getCustomerNumber().toLowerCase().trim(), dealerProfile -> dealerProfile, (a, b) -> b));
+    private Map<String, DealerProfile> getDealerMap(ImportTask importTask) {
+        return importTask.getImportTaskDealers().stream().filter(StatefulEntity::isActive)
+                .collect(Collectors.toMap(ImportTaskDealer::getDmsId, ImportTaskDealer::getDealerProfile, (a, b) -> b));
     }
 
     private ImportTask getImportTask(Long importTaskId) {

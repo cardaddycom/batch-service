@@ -1,5 +1,6 @@
 package com.cardaddy.batch.job.processors;
 
+import com.cardaddy.batch.exception.InvalidDataException;
 import com.cardaddy.batch.model.FlatVehicleListing;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.item.ItemProcessor;
@@ -22,9 +23,13 @@ public class VehicleCategoryProcessor implements ItemProcessor<FlatVehicleListin
         //Strange situation with carsforsale where they are referring to the body as the category type
         String category = listing.getCategory() != null ? listing.getCategory() : listing.getBody();
 
-        if ((CURRENT_YEAR - Integer.parseInt(listing.getYear())) >= 25) {
-            //If a vehicle is 25 years or older we move it into the classic-car category. This doesn't work perfectly with all vehicles.
-            return "classic-cars";
+        try {
+            if ((CURRENT_YEAR - Integer.parseInt(listing.getYear())) >= 25) {
+                //If a vehicle is 25 years or older we move it into the classic-car category. This doesn't work perfectly with all vehicles.
+                return "classic-cars";
+            }
+        } catch (NumberFormatException ex) {
+            new InvalidDataException(ex.getMessage());
         }
         return getCategory(category);
     }

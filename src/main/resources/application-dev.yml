@@ -15,7 +15,7 @@ logging:
           listener: error
           job:
             processors: error
-            writer: info
+            writer: debug
             tasklet: debug
     org:
       hibernate:

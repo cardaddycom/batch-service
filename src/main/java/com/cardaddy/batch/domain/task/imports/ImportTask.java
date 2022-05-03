@@ -6,10 +6,8 @@ import com.cardaddy.batch.domain.task.lookup.FtpAccount;
 import com.cardaddy.batch.domain.task.lookup.ImportSystem;
 import lombok.Data;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
+import java.util.List;
 
 @Data
 @Entity
@@ -34,6 +32,9 @@ public class ImportTask extends StatefulEntity {
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "ftp_account_id", nullable = false)
     private FtpAccount ftpAccount;
+
+    @OneToMany(mappedBy = "importTask", orphanRemoval = true, cascade = CascadeType.ALL)
+    private List<ImportTaskDealer> importTaskDealers;
 
     @Override
     public String toString() {

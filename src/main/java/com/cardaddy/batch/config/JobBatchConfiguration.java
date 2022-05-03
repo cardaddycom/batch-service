@@ -3,6 +3,7 @@ package com.cardaddy.batch.config;
 import com.cardaddy.batch.domain.listing.VehicleListing;
 import com.cardaddy.batch.domain.task.imports.ImportTask;
 import com.cardaddy.batch.domain.task.lookup.ImportConfiguration;
+import com.cardaddy.batch.exception.InvalidDataException;
 import com.cardaddy.batch.exception.MissingLocationException;
 import com.cardaddy.batch.job.processors.*;
 import com.cardaddy.batch.job.tasklet.DeleteVehicleTasklet;
@@ -180,6 +181,9 @@ public class JobBatchConfiguration {
                 .listener(vehicleReaderListener())
                 .listener(vehicleItemWriterListener())
                 .listener(vehicleItemProcessorListener())
+                .faultTolerant()
+                .skipLimit(1000)
+                .skip(InvalidDataException.class)
                 .build();
     }
 
