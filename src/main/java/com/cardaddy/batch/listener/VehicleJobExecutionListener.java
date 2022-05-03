@@ -15,7 +15,8 @@ public class VehicleJobExecutionListener implements JobExecutionListener {
 
     @Override
     public void afterJob(JobExecution jobExecution) {
-        if(!ExitStatus.COMPLETED.equals(jobExecution.getExitStatus().getExitCode())) {
+        if(!ExitStatus.COMPLETED.equals(jobExecution.getExitStatus())) {
+            System.out.println("Job Failed");
             System.exit(-1);
         }
         System.out.println("Job Completed");
