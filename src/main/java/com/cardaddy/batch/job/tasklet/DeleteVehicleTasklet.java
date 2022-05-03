@@ -27,6 +27,7 @@ public class DeleteVehicleTasklet implements Tasklet, InitializingBean {
 
     @Override
     public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
+        log.info("DeleteVehicleTasklet");
         //We need to delete vehicles this way inorder to keep the opensearch indexes in sync.
         List<Long> vehiclePks = vehicleListingRepository.vehiclesToBeDeleted(importTaskId, stepContribution.getStepExecution().getJobExecution().getJobId());
 
