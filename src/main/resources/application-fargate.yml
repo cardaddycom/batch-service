@@ -12,3 +12,17 @@ spring:
                 type: static
                 access_key_id: ${AWS_ACCESS_KEY_ID}
                 secret_access_key: ${AWS_SECRET_ACCESS_KEY}
+ogging:
+  level:
+    ROOT: error
+    com:
+      cardaddy:
+        batch: info
+        batch.listener: error
+        batch.job.processors: error
+        batch.job.writer: error
+        batch.ob.tasklet: error
+    org:
+      hibernate:
+        SQL: error
+      springframework: error
