@@ -126,7 +126,7 @@ public class VehicleItemWriter implements ItemWriter<FlatVehicleListing> {
             }
         }
 
-        log.debug("Saving Vehicles {}", vehicleListings.size());
+        log.info("Saving Vehicles {}", vehicleListings.size());
         vehicleListingRepository.saveAll(vehicleListings);
         vehicleListingRepository.flush();
 
