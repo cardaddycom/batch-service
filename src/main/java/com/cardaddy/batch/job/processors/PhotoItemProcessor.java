@@ -10,6 +10,9 @@ public class PhotoItemProcessor implements ItemProcessor<FlatVehicleListing, Fla
     @Override
     public FlatVehicleListing process(FlatVehicleListing flatVehicleListing) throws Exception {
         log.info("Photo Item Processor");
+        if("".equals(flatVehicleListing.getPhotoURLs())) {
+            flatVehicleListing.setPhotoURLs(null);
+        }
         return flatVehicleListing;
     }
 
