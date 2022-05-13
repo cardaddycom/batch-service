@@ -36,7 +36,10 @@ public class VehicleListingItemProcessor implements ItemProcessor<FlatVehicleLis
         listing.setInteriorColorCustom(listing.getInteriorColorCustom().replaceAll("[^\\x20-\\x7e]", ""));
         listing.setExteriorColorCustom(listing.getExteriorColorCustom().replaceAll("[^\\x20-\\x7e]", ""));
         listing.setDetroitTrader(DETROIT_TRADER_ID == importTaskId);
-        listing.setPhotoURLs(listing.getPhotoURLs().replaceAll("\\|", ","));
+
+        if(listing.getPhotoURLs() != null) {
+            listing.setPhotoURLs(listing.getPhotoURLs().replaceAll("\\|", ","));
+        }
 
         return listing;
     }
